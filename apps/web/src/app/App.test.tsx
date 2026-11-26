@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/app/App";
+import { axiosInstance } from "@/shared/api/axiosInstance";
 import { getHealth } from "@/shared/api/health";
 
 vi.mock("@/shared/api/health", async (importOriginal) => ({
@@ -13,6 +14,7 @@ const getHealthMock = vi.mocked(getHealth);
 describe("App", () => {
   beforeEach(() => {
     getHealthMock.mockReset();
+    vi.restoreAllMocks();
   });
 
   it("shows the app name", () => {
@@ -43,6 +45,21 @@ describe("App", () => {
 
   it("shows the api as unreachable when the health request fails", async () => {
     getHealthMock.mockRejectedValue(new Error("Network Error"));
+
+    render(<App />);
+
+    expect(await screen.findByText("API: unreachable")).toBeInTheDocument();
+    expect(screen.getByText("Transcriber: unknown")).toBeInTheDocument();
+  });
+
+  it("shows the api as unreachable when the answer is not a health report", async () => {
+    // A misrouted request can answer 200 with the app's own index.html instead of the api.
+    const { getHealth: realGetHealth } =
+      await vi.importActual<typeof import("@/shared/api/health")>("@/shared/api/health");
+    getHealthMock.mockImplementation(realGetHealth);
+    vi.spyOn(axiosInstance, "get").mockResolvedValue({
+      data: "<!doctype html><html><body></body></html>",
+    });
 
     render(<App />);
 

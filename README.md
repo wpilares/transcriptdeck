@@ -13,6 +13,7 @@ The project is in an early stage: this version contains the project skeleton and
 - A Mac with Apple Silicon
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (runs the web app and the API)
 - [uv](https://docs.astral.sh/uv/) (runs the transcription service natively)
+- [Node.js](https://nodejs.org/) with npm (web development commands and the Biome Git hook; CI uses Node.js 24; not needed to run the app with Docker)
 - [ffmpeg](https://ffmpeg.org/) (`brew install ffmpeg`; used by later phases)
 
 ## Quick start
@@ -63,7 +64,10 @@ The three projects are independent and talk to each other only over HTTP:
 
 ### Web (`apps/web`)
 
+Run these from `apps/web`:
+
 ```sh
+cd apps/web
 npm install
 npm run dev         # dev server; proxies /api to http://localhost:8000
 npm run test        # unit tests (single run)
@@ -74,9 +78,10 @@ npm run build       # production build
 
 ### API (`apps/api`) and transcriber (`services/transcriber`)
 
-Run these inside each project directory:
+Run these from the directory of the project you are working on:
 
 ```sh
+cd apps/api        # or: cd services/transcriber
 uv sync
 uv run pytest
 uv run ruff check .
@@ -92,12 +97,14 @@ uv run uvicorn api.main:app --port 8000
 
 ### Git hooks
 
-The repository uses [Lefthook](https://lefthook.dev/) to lint staged files before each commit (Biome for the web app, Ruff for Python). Install the hooks once after cloning:
+The repository uses [Lefthook](https://lefthook.dev/) to lint staged files before each commit (Biome for the web app, Ruff for Python). Install the hooks once after cloning, from the repository root:
 
 ```sh
 brew install lefthook
 lefthook install
 ```
+
+The Biome hook uses the copy installed in `apps/web/node_modules`, so run `npm install` in `apps/web` before committing web files.
 
 ## License
 

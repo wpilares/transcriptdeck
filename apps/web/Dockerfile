@@ -2,7 +2,6 @@ FROM node:24-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies first so this layer is reused when only the source changes.
 COPY package.json package-lock.json ./
 RUN npm ci
 

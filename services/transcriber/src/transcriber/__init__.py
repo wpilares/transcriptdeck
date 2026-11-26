@@ -1,1 +1,0 @@
-"""TranscriptDeck transcription service."""

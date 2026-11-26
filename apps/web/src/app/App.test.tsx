@@ -53,7 +53,6 @@ describe("App", () => {
   });
 
   it("shows the api as unreachable when the answer is not a health report", async () => {
-    // A misrouted request can answer 200 with the app's own index.html instead of the api.
     const { getHealth: realGetHealth } =
       await vi.importActual<typeof import("@/shared/api/health")>("@/shared/api/health");
     getHealthMock.mockImplementation(realGetHealth);

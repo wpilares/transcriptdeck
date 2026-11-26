@@ -10,7 +10,6 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 
-# Install dependencies first so this layer is reused when only the source changes.
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --locked --no-install-project
 

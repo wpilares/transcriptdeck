@@ -44,8 +44,6 @@ def test_is_not_healthy_when_the_url_is_malformed(base_url: str) -> None:
 
 
 def test_is_not_healthy_when_the_check_exceeds_the_total_time_bound() -> None:
-    # The mock transport ignores the per-phase HTTP timeouts, like a transcriber that keeps
-    # every phase just under its limit, so only a bound on the whole check can stop it.
     async def handler(request: httpx2.Request) -> httpx2.Response:
         await asyncio.sleep(1)
         return httpx2.Response(200, json={"status": "ok"})

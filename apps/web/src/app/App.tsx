@@ -10,7 +10,6 @@ type DisplayedHealth = {
 
 const CHECKING: DisplayedHealth = { api: "checking", transcriber: "checking" };
 
-// When the API does not answer, nothing is known about the transcriber behind it.
 const API_UNREACHABLE: DisplayedHealth = {
   api: ServiceStatus.Unreachable,
   transcriber: "unknown",

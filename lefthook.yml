@@ -1,0 +1,33 @@
+# Lints staged files before each commit. Tests run in CI, not here.
+# Install once after cloning: lefthook install
+pre-commit:
+  parallel: true
+  jobs:
+    - name: web biome
+      root: apps/web/
+      glob:
+        - "*.{js,jsx,ts,tsx,json,jsonc,css,html}"
+        - "**/*.{js,jsx,ts,tsx,json,jsonc,css,html}"
+      run: npx biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+
+    - name: api ruff check
+      root: apps/api/
+      glob: &python_files
+        - "*.py"
+        - "**/*.py"
+      run: uv run ruff check {staged_files}
+
+    - name: api ruff format
+      root: apps/api/
+      glob: *python_files
+      run: uv run ruff format --check {staged_files}
+
+    - name: transcriber ruff check
+      root: services/transcriber/
+      glob: *python_files
+      run: uv run ruff check {staged_files}
+
+    - name: transcriber ruff format
+      root: services/transcriber/
+      glob: *python_files
+      run: uv run ruff format --check {staged_files}

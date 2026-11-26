@@ -1,0 +1,15 @@
+services:
+  api:
+    build: ./apps/api
+    environment:
+      # The transcriber runs natively on the host (containers on macOS have no GPU access).
+      TRANSCRIBER_URL: http://host.docker.internal:9000
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  web:
+    build: ./apps/web
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:8080:80"

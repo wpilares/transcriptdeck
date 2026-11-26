@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app, get_transcriber_client
@@ -28,6 +29,17 @@ def test_health_reports_transcriber_ok_when_reachable() -> None:
 
 def test_health_still_answers_when_transcriber_is_unreachable() -> None:
     response = get_health(healthy=False)
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "transcriber": "unreachable"}
+
+
+def test_health_still_answers_when_the_transcriber_url_is_malformed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRANSCRIBER_URL", "http://host:abc")
+
+    response = TestClient(app).get("/api/health")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "transcriber": "unreachable"}

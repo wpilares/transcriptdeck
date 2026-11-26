@@ -1,6 +1,8 @@
 import asyncio
+import time
 
 import httpx2
+import pytest
 
 from api.transcriber import HttpTranscriberClient
 
@@ -32,3 +34,29 @@ def test_is_not_healthy_when_connection_fails() -> None:
         raise httpx2.ConnectError("connection refused", request=request)
 
     assert is_healthy(handler) is False
+
+
+@pytest.mark.parametrize("base_url", ["http://host:abc", "http://[::1"])
+def test_is_not_healthy_when_the_url_is_malformed(base_url: str) -> None:
+    client = HttpTranscriberClient(base_url)
+
+    assert asyncio.run(client.is_healthy()) is False
+
+
+def test_is_not_healthy_when_the_check_exceeds_the_total_time_bound() -> None:
+    # The mock transport ignores the per-phase HTTP timeouts, like a transcriber that keeps
+    # every phase just under its limit, so only a bound on the whole check can stop it.
+    async def handler(request: httpx2.Request) -> httpx2.Response:
+        await asyncio.sleep(1)
+        return httpx2.Response(200, json={"status": "ok"})
+
+    client = HttpTranscriberClient(
+        "http://transcriber.test", timeout=0.05, transport=httpx2.MockTransport(handler)
+    )
+
+    started = time.monotonic()
+    healthy = asyncio.run(client.is_healthy())
+    elapsed = time.monotonic() - started
+
+    assert healthy is False
+    assert elapsed < 0.5

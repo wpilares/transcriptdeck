@@ -8,7 +8,10 @@ pre-commit:
       glob:
         - "*.{js,jsx,ts,tsx,json,jsonc,css,html}"
         - "**/*.{js,jsx,ts,tsx,json,jsonc,css,html}"
-      run: npx biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      # --no-install makes npx fail when Biome is not installed locally (run "npm install"
+      # in apps/web) instead of downloading it. The scoped name matters: a bare "biome"
+      # is an unrelated npm package that npx would fetch, or reuse from its cache.
+      run: npx --no-install @biomejs/biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
 
     - name: api ruff check
       root: apps/api/

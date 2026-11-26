@@ -1,7 +1,10 @@
 name: CI
 
 on:
+  # Pushes to pull request branches are already covered by the pull_request event.
   push:
+    branches:
+      - main
   pull_request:
 
 permissions:
